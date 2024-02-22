@@ -5,6 +5,7 @@ import { TaskListType } from "../../common/types/TaskTypes";
 import { useParams } from "react-router-dom";
 import HttpService from "../../service/Https-services";
 import { AddTaskForm } from "./AddTaskForm";
+import { toast } from "react-toastify";
 export const AddTask = ({ isEdit }: { isEdit: boolean }) => {
   const [formData, setFormData] = useState<TaskListType>();
 
@@ -17,7 +18,9 @@ export const AddTask = ({ isEdit }: { isEdit: boolean }) => {
       if (res?.data?.data) {
         setFormData(res?.data?.data);
       }
-    } catch (error) {}
+    } catch (error: any) {
+      toast.error(error.response.data.message);
+    }
   }, [id]);
 
   useEffect(() => {
