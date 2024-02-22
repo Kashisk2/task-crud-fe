@@ -12,28 +12,34 @@ import {
 } from "@mui/material";
 import React from "react";
 
+// ConfirmationDialog component
 export const ConfirmationDialog = ({
-  handleClickDelete,
+  handleClickDelete, // Function to handle delete action
 }: {
-  handleClickDelete: () => void;
+  handleClickDelete: () => void; // Function prop to handle delete action
 }) => {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(false); // State to manage dialog open/close
 
+  // Function to open the dialog
   const handleClickOpen = () => {
     setOpen(true);
   };
 
+  // Function to close the dialog
   const handleClose = () => {
     setOpen(false);
   };
+
   return (
     <Box>
+      {/* IconButton to trigger the confirmation dialog */}
       <IconButton onClick={handleClickOpen}>
         <Delete color="error" />
       </IconButton>
+      {/* Confirmation Dialog */}
       <Dialog
-        open={open}
-        onClose={handleClose}
+        open={open} // Dialog open state
+        onClose={handleClose} // Function to handle dialog close
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >

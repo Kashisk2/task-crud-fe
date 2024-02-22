@@ -7,9 +7,11 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AddTask } from "./pages/AddTask";
 import { AddTaskForm } from "./pages/AddTask/AddTaskForm";
+import { NotFoundPage } from "./pages/NotFound";
 function App() {
   return (
     <>
+      {/* Added ToastContainer for toast message for error and message */}
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -22,16 +24,20 @@ function App() {
         pauseOnHover
         theme="light"
       />
+      {/* Declare all routes here  */}
       <Router>
         <Routes>
+          {/* Route for HomePage */}
           <Route
             path={PAGE_ROUTES.HomePage}
             element={
+              // Use PublicRoute component to handle authentication
               <PublicRoute>
                 <HomePage />
               </PublicRoute>
             }
           />
+          {/* Route for AddTaskForm */}
           <Route
             path={PAGE_ROUTES.AddTask}
             element={
@@ -40,14 +46,18 @@ function App() {
               </PublicRoute>
             }
           />
+          {/* Route for EditTask */}
           <Route
             path={PAGE_ROUTES.EditTask}
             element={
               <PublicRoute>
+                {/* Pass isEdit prop to AddTask component */}
                 <AddTask isEdit={true} />
               </PublicRoute>
             }
           />
+          {/* Route for any other undefined paths */}
+          <Route path={PAGE_ROUTES.Any} element={<NotFoundPage />} />
         </Routes>
       </Router>
     </>

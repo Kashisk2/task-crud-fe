@@ -31,42 +31,53 @@ import HttpService from "../../../service/Https-services";
 import { toast } from "react-toastify";
 import moment from "moment";
 import { Style } from "./AppTaskForm.style";
+
 interface AddTaskFormProps {
   formData?: TaskListType;
 }
+
 export const AddTaskForm = (props: AddTaskFormProps) => {
+  // Get id from URL params
   const { id }: any = useParams();
+  // Hook for navigation
   const navigate = useNavigate();
+
+  // Function to validate form fields
   const validate = (values: any) => {
     let errors: any = {};
-    if (!values.name) errors.name = "This feild is required";
+    if (!values.name) errors.name = "This field is required";
     if (!values.description) {
-      errors.description = "This feild is required";
+      errors.description = "This field is required";
     } else {
       if (values.description.length > 250) {
-        errors.description = "Description should be 250 character";
+        errors.description = "Description should be 250 characters";
       }
     }
-    if (!values.priority) errors.priority = "This feild is required";
+    if (!values.priority) errors.priority = "This field is required";
     if (!values.due_date) {
-      errors.due_date = "This feild is required";
+      errors.due_date = "This field is required";
     } else {
-      const date = moment(formik.values.due_date).isBefore(
-        moment().add("-1", "days")
-      );
+      const date = moment(values.due_date).isBefore(moment().add("-1", "days"));
       if (date) {
-        errors.due_date = "Please enter valid date";
+        errors.due_date = "Please enter a valid date";
       }
     }
     return errors;
   };
+
+  // Formik hook for form handling
   const formik = useFormik({
+    // Initial values from formData prop or TaskModel
     initialValues: new TaskModel(props.formData),
+    // Validation function
     validate: validate,
+    // Do not validate on change, only on submit
     validateOnChange: false,
+    // Submit function
     onSubmit: async () => {
       try {
         if (id) {
+          // If id exists, update task
           const data = {
             name: formik.values.name,
             description: formik.values.description,
@@ -77,15 +88,16 @@ export const AddTaskForm = (props: AddTaskFormProps) => {
           };
           const response = await HttpService.patch(
             API_ROUTES.UpdateTask.replace(":id", id),
-
             data
           );
           if (response.data.message) {
+            // Show success message and navigate to homepage
             toast.success(response.data.message);
             formik.resetForm();
             navigate(PAGE_ROUTES.HomePage);
           }
         } else {
+          // If no id, create new task
           const data = {
             name: formik.values.name,
             description: formik.values.description,
@@ -96,22 +108,25 @@ export const AddTaskForm = (props: AddTaskFormProps) => {
           };
           const response = await HttpService.post(API_ROUTES.CreateTask, data);
           if (response.data.message) {
+            // Show success message and navigate to homepage
             toast.success(response.data.message);
             formik.resetForm();
             navigate(PAGE_ROUTES.HomePage);
           }
         }
       } catch (error: any) {
-        console.log(error);
+        // Handle error
+        console.error(error);
         toast.error(error?.response?.data?.message);
       }
     },
   });
-  console.log(formik.values);
+
   return (
     <Container maxWidth="md" sx={{ py: 2 }}>
       <form onSubmit={formik.handleSubmit}>
         <Grid container spacing={3}>
+          {/* Task Name Field */}
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
@@ -129,6 +144,7 @@ export const AddTaskForm = (props: AddTaskFormProps) => {
               variant="outlined"
             />
           </Grid>
+          {/* Priority Field */}
           <Grid item xs={12} sm={6}>
             <FormControl fullWidth>
               <InputLabel id="demo-simple-select-label">Priority *</InputLabel>
@@ -145,6 +161,7 @@ export const AddTaskForm = (props: AddTaskFormProps) => {
                 name="priority"
                 id="priority"
               >
+                {/* Priority Options */}
                 {PriorityOption.map(
                   (el: { key: string; value: string; bgcolor: string }) => (
                     <MenuItem sx={{ bgcolor: el.bgcolor }} value={el.value}>
@@ -156,6 +173,7 @@ export const AddTaskForm = (props: AddTaskFormProps) => {
               <FormHelperText error>{formik.errors.priority}</FormHelperText>
             </FormControl>
           </Grid>
+          {/* Description Field */}
           <Grid item xs={12} sm={12}>
             <Box sx={{ position: "relative" }}>
               <TextField
@@ -176,6 +194,7 @@ export const AddTaskForm = (props: AddTaskFormProps) => {
                 label="Description *"
                 variant="outlined"
               />
+              {/* Character count */}
               <Typography variant="body2" sx={Style.MaxLengthStyle}>
                 {`${
                   formik.values?.description?.length
@@ -185,7 +204,7 @@ export const AddTaskForm = (props: AddTaskFormProps) => {
               </Typography>
             </Box>
           </Grid>
-
+          {/* Due Date Field */}
           <Grid item xs={12} sm={6}>
             <LocalizationProvider dateAdapter={AdapterMoment}>
               <DemoContainer components={["DatePicker"]}>
@@ -213,7 +232,19 @@ export const AddTaskForm = (props: AddTaskFormProps) => {
             </LocalizationProvider>
           </Grid>
         </Grid>
-        <Stack direction={"row"} justifyContent={"flex-end"} sx={{ py: 1 }}>
+        <Stack
+          direction={"row"}
+          justifyContent={"flex-end"}
+          sx={{ py: 1 }}
+          gap={1}
+        >
+          <Button
+            variant="outlined"
+            onClick={() => navigate(PAGE_ROUTES.HomePage)}
+            type="button"
+          >
+            Cancel
+          </Button>
           <Button variant="contained" type="submit">
             Submit
           </Button>
